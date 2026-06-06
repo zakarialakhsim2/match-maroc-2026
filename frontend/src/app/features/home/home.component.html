@@ -1,0 +1,148 @@
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="flag-icon">🇲🇦</div>
+    <h1 class="site-title">Match Maroc 2026</h1>
+    <p class="site-subtitle">Coupe du Monde FIFA · USA / Canada / Mexique</p>
+  </header>
+
+  <!-- LOADING -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Chargement du prochain match...</p>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-state" *ngIf="error && !loading">
+    <p>⚠️ Aucun match à venir pour le moment.</p>
+  </div>
+
+  <!-- MATCH CONTENT -->
+  <ng-container *ngIf="match && !loading">
+
+    <!-- MATCH CARD -->
+    <div class="match-card">
+      <div class="match-banner">
+        <span class="badge">🏆 {{ match.groupStage }}</span>
+        <span class="banner-label">{{ match.competition }}</span>
+      </div>
+      <div class="teams-row">
+        <div class="team">
+          <div class="team-emoji">{{ flagUrl[match.flagA] || '🏳️' }}</div>
+          <div class="team-name">{{ match.teamA }}</div>
+        </div>
+        <div class="vs-block">
+          <span class="vs-text" *ngIf="!match.played">VS</span>
+          <span class="final-score" *ngIf="match.played">{{ match.scoreA }} - {{ match.scoreB }}</span>
+        </div>
+        <div class="team">
+          <div class="team-emoji">{{ flagUrl[match.flagB] || '🏳️' }}</div>
+          <div class="team-name">{{ match.teamB }}</div>
+        </div>
+      </div>
+      <div class="match-info-grid">
+        <div class="info-chip">
+          <span class="info-label">📅 Date</span>
+          <span class="info-value">{{ match.dateFormatted }}</span>
+        </div>
+        <div class="info-chip">
+          <span class="info-label">🕘 Heure (Maroc)</span>
+          <span class="info-value">{{ match.timeFormatted }}</span>
+        </div>
+        <div class="info-chip">
+          <span class="info-label">🏟️ Stade</span>
+          <span class="info-value">{{ match.stadium }}</span>
+        </div>
+        <div class="info-chip">
+          <span class="info-label">📍 Ville</span>
+          <span class="info-value">{{ match.city }}</span>
+        </div>
+      </div>
+      <div class="tv-row">
+        <span class="tv-badge">📺 {{ match.tvChannel }}</span>
+      </div>
+    </div>
+
+    <!-- COUNTDOWN -->
+    <app-countdown [dateTimeUtc]="match.dateTimeUtc"></app-countdown>
+
+    <!-- ACTIONS -->
+    <div class="action-row">
+      <button class="btn btn-primary" (click)="showEmailForm = !showEmailForm" *ngIf="!reminded">
+        🔔 Me rappeler
+      </button>
+      <button class="btn btn-success" *ngIf="reminded" disabled>
+        ✅ Rappel activé
+      </button>
+      <button class="btn btn-secondary" (click)="shareWhatsApp()">
+        📱 WhatsApp
+      </button>
+    </div>
+
+    <!-- EMAIL FORM -->
+    <div class="email-form" *ngIf="showEmailForm">
+      <input type="email" [(ngModel)]="emailInput" placeholder="ton@email.com" class="email-input"/>
+      <button class="btn btn-primary" (click)="submitReminder()">Confirmer</button>
+      <p class="form-hint">Tu recevras un rappel 24h et 1h avant le match</p>
+    </div>
+
+    <!-- PREDICTIONS -->
+    <div class="predict-card">
+      <h2 class="card-title">🎯 Ta prédiction</h2>
+
+      <div class="score-row" *ngIf="!voted">
+        <div class="score-input-group">
+          <label>{{ flagUrl[match.flagA] || '' }} {{ match.teamA }}</label>
+          <input type="number" [(ngModel)]="scoreA" min="0" max="20" class="score-input"/>
+        </div>
+        <div class="score-dash">—</div>
+        <div class="score-input-group">
+          <label>{{ flagUrl[match.flagB] || '' }} {{ match.teamB }}</label>
+          <input type="number" [(ngModel)]="scoreB" min="0" max="20" class="score-input"/>
+        </div>
+      </div>
+
+      <p class="outcome-label" *ngIf="!voted">→ {{ getOutcomeLabel() }}</p>
+
+      <button class="btn btn-primary btn-full" (click)="vote()" *ngIf="!voted">
+        ⚽ Voter
+      </button>
+      <div class="voted-msg" *ngIf="voted">
+        ✅ Merci ! Ton vote est enregistré.
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-block" *ngIf="stats && stats.totalVotes > 0">
+        <p class="stats-title">{{ stats.totalVotes }} supporters ont voté</p>
+        <div class="stat-bar-row">
+          <span class="stat-label">Victoire 🇲🇦</span>
+          <div class="bar-track"><div class="bar-fill bar-win" [style.width.%]="stats.winPct"></div></div>
+          <span class="stat-pct">{{ stats.winPct }}%</span>
+        </div>
+        <div class="stat-bar-row">
+          <span class="stat-label">Nul</span>
+          <div class="bar-track"><div class="bar-fill bar-draw" [style.width.%]="stats.drawPct"></div></div>
+          <span class="stat-pct">{{ stats.drawPct }}%</span>
+        </div>
+        <div class="stat-bar-row">
+          <span class="stat-label">Défaite</span>
+          <div class="bar-track"><div class="bar-fill bar-lose" [style.width.%]="stats.losePct"></div></div>
+          <span class="stat-pct">{{ stats.losePct }}%</span>
+        </div>
+        <p class="avg-score">Score moyen prédit : {{ stats.avgScoreA }} – {{ stats.avgScoreB }}</p>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <app-history></app-history>
+
+  </ng-container>
+
+  <footer class="footer">
+    <p>🇲🇦 Match Maroc 2026 — Fait avec ❤️ pour les supporters marocains</p>
+    <p class="footer-links">
+      <a (click)="copyLink()" style="cursor:pointer">Copier le lien</a>
+    </p>
+  </footer>
+</div>
