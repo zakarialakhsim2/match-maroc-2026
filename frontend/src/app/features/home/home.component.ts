@@ -81,7 +81,7 @@ export class HomeComponent implements OnInit {
 
   shareWhatsApp() {
     if (!this.match) return;
-    const text = `🇲🇦 ${this.match.teamA} vs ${this.match.teamB}\n${this.match.dateTimeMaroc}\n${this.match.stadium}, ${this.match.city}\nTV: ${this.match.tvChannel}\n\nAllez les Lions de l'Atlas ! 🦁\nhttps://matchmaroc2026.ma`;
+    const text = `🇲🇦 ${this.match.teamA} vs ${this.match.teamB}\n${this.match.dateTimeMaroc}\n${this.match.stadium}, ${this.match.city}\nTV: ${this.match.tvChannel}\n\nAllez les Lions de l'Atlas ! 🦁\nhttps://matchmaroc2026.up.railway.app`;
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
   }
 
