@@ -8,4 +8,10 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", \
+  "-Dspring.datasource.url=${DB_URL}", \
+  "-Dspring.datasource.username=${DB_USER}", \
+  "-Dspring.datasource.password=${DB_PASSWORD}", \
+  "-Dspring.datasource.driver-class-name=org.postgresql.Driver", \
+  "-Dspring.autoconfigure.exclude=org.springframework.boot.autoconfigure.mail.MailSenderAutoConfiguration", \
+  "-jar", "app.jar"]
